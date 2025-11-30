@@ -23,7 +23,7 @@ CREATE TABLE respondent(
     opinion_vader VARCHAR(50),
     opinion_calrissian VARCHAR(50),
     opinion_boba VARCHAR (50),
-    opinion_C-3P0 VARCHAR (50),
+    opinion_C_3P0 VARCHAR (50),
     opinion_R2 VARCHAR(50),
     opinion_jarjar VARCHAR(50),
     opinion_padme VARCHAR (50),
