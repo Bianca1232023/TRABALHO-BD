@@ -12,6 +12,11 @@ CREATE TABLE respondent(
     who_shot_first VARCHAR(50)
 );
 
+CREATE TABLE film (
+    id SERIAL PRIMARY KEY,
+    film_name VARCHAR(100) UNIQUE NOT NULL
+);
+
 CREATE TABLE film_seen (
     id SERIAL PRIMARY KEY,
     respondent_id INT REFERENCES respondent(respondent_id),
