@@ -3,8 +3,8 @@ CREATE TABLE film (
     film_name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE respondent(
-    respondentID INT PRIMARY KEY,
+CREATE TABLE respondent (
+    respondent_id INT PRIMARY KEY,
     gender VARCHAR(50),
     age INT,
     household_income VARCHAR(50),
@@ -14,21 +14,9 @@ CREATE TABLE respondent(
     fan_of_star_wars VARCHAR(50),
     fan_of_startrek VARCHAR(50),
     fan_of_expanded_universe VARCHAR(50),
-    who_shot_first VARCHAR(50),
-    opinion_han VARCHAR(50),
-    opinion_luke VARCHAR(50),
-    opinion_leia VARCHAR(50),
-    opinion_anakin VARCHAR(50),
-    opinion_palpatine VARCHAR(50),
-    opinion_vader VARCHAR(50),
-    opinion_calrissian VARCHAR(50),
-    opinion_boba VARCHAR (50),
-    opinion_C_3P0 VARCHAR (50),
-    opinion_R2 VARCHAR(50),
-    opinion_jarjar VARCHAR(50),
-    opinion_padme VARCHAR (50),
-    opinion_yoda VARCHAR(50)
+    who_shot_first VARCHAR(50)
 );
+
 
 CREATE TABLE film_seen (
     film_seen_id INT PRIMARY KEY,
@@ -43,5 +31,18 @@ CREATE TABLE film_ranking (
     film_id INT NOT NULL REFERENCES film(filmID),
     ranking INT
 );
+
+CREATE TABLE character(
+    character_id INT PRIMARY KEY,
+    character_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE character_opinion (
+    id INT PRIMARY KEY,
+    respondent_id INT NOT NULL REFERENCES respondent(respondent_id),
+    character_id INT NOT NULL REFERENCES character(character_id),
+    opinion VARCHAR(20) 
+);
+
 
 
