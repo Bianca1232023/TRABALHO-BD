@@ -46,3 +46,15 @@ CREATE TABLE public.star_wars (
 	"Education" varchar(50) NULL,
 	"Location (Census Region)" varchar(50) NULL
 );
+
+--insert into oi
+-- select 
+--  sw."RespondentID"::bigint
+-- 	from star_wars sw 
+	
+	
+-- select * from oi 
+-- where test is not null
+
+--insert into oi
+-- select RespondentID::BigInt from star_wars
