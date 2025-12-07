@@ -45,7 +45,7 @@ CREATE TABLE film_ranking (
 );
 
 CREATE TABLE character_film (
-    character_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    character_id INT PRIMARY KEY,
     character_name VARCHAR(100) NOT NULL
 );
 
@@ -53,7 +53,7 @@ CREATE TABLE character_opinion (
     character_opinion_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     respondent_id BIGINT NOT NULL REFERENCES respostas(id),
     character_id INT NOT NULL REFERENCES character_film(character_id),
-    opinion VARCHAR(20) 
+    opinion VARCHAR(100) 
 );
 
 
