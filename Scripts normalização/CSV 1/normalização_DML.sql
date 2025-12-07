@@ -70,22 +70,22 @@ WHERE sw."respondentid" IS NOT null;
 SELECT COUNT (*) FROM respostas; 
 SELECT COUNT (*) FROM star_wars sw;
 
-INSERT INTO character_film (character_name)
+INSERT INTO character_film (character_id , character_name)
 VALUES
-('Han Solo'),
-('Luke Skywalker'),
-('Princess Leia Organa'),
-('Anakin Skywalker'),
-('Obi Wan Kenobi'),
-('Emperor Palpatine'),
-('Darth Vader'),
-('Lando Calrissian'),
-('Boba Fett'),
-('C-3P0'),
-('R2 D2'),
-('Jar Jar Binks'),
-('Padme Amidala'),
-('Yoda');
+(1, 'Han Solo'),
+(2, 'Luke Skywalker'),
+(3, 'Princess Leia Organa'),
+(4, 'Anakin Skywalker'),
+(5, 'Obi Wan Kenobi'),
+(6, 'Emperor Palpatine'),
+(7, 'Darth Vader'),
+(8, 'Lando Calrissian'),
+(9, 'Boba Fett'),
+(10, 'C-3P0'),
+(11, 'R2 D2'),
+(12, 'Jar Jar Binks'),
+(13, 'Padme Amidala'),
+(14, 'Yoda');
 
 INSERT INTO film_seen (respondent_id, film_id, seen)
 SELECT 
