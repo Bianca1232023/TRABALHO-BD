@@ -3,14 +3,26 @@ CREATE OR REPLACE FUNCTION contar_filmes_vistos(p_respondent_id BIGINT)
 RETURNS INT AS $$
 DECLARE
     v_count INT;
+    v_is_internal BOOLEAN;
 BEGIN
-    SELECT COUNT(*) INTO v_count
-    FROM film_seen
-    WHERE respondent_id = p_respondent_id
-    AND seen IS NOT NULL
-    AND TRIM(seen) <> '';
-    
-    RETURN v_count;
+    SELECT EXISTS(SELECT 1 FROM respostas WHERE id = p_respondent_id) INTO v_is_internal;
+
+    IF v_is_internal THEN
+        SELECT COUNT(*) INTO v_count
+        FROM film_seen
+        WHERE respondent_id = p_respondent_id
+          AND seen IS NOT NULL
+          AND TRIM(seen) <> '';
+    ELSE
+        SELECT COUNT(*) INTO v_count
+        FROM film_seen fs
+        JOIN respostas r ON fs.respondent_id = r.id
+        WHERE r.respondent_id = p_respondent_id
+          AND fs.seen IS NOT NULL
+          AND TRIM(fs.seen) <> '';
+    END IF;
+
+    RETURN COALESCE(v_count, 0);
 END;
 $$ LANGUAGE plpgsql;
 
