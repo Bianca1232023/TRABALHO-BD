@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION contar_filme_visto()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE film
-    SET film_name = film_name  -- Apenas para manter o timestamp
+    SET film_name = film_name 
     WHERE filmID = NEW.film_id;
     RETURN NEW;
 END;

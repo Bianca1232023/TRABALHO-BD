@@ -110,3 +110,32 @@ SELECT COUNT(*) as filmes_vistos_depois FROM film_seen WHERE respondent_id = 169
 
 -- 4. Ver detalhes de todos os filmes vistos
 SELECT * FROM film_seen WHERE respondent_id = 16923;
+
+-- 1. Qual região tem mais respondentes?
+SELECT region, total_respondentes 
+FROM v_respondentes_por_regiao 
+ORDER BY total_respondentes DESC 
+LIMIT 1;
+
+-- 2. Qual é o filme mais amado (menor ranking)?
+SELECT filmID, film_name, ranking_medio 
+FROM v_ranking_medio_filmes 
+ORDER BY ranking_medio ASC 
+LIMIT 1;
+
+-- 3. Qual é o filme menos amado (maior ranking)?
+SELECT filmID, film_name, ranking_medio 
+FROM v_ranking_medio_filmes 
+ORDER BY ranking_medio DESC 
+LIMIT 1;
+
+-- 4. Quantos são fans de Star Wars?
+SELECT fan_of_star_wars, total_respondentes 
+FROM v_fans_vs_nao_fans;
+
+-- 5. Dos fans, quantos também são fans de Star Trek?
+SELECT 
+    fan_of_star_wars,
+    tambem_fan_startrek
+FROM v_fans_vs_nao_fans 
+WHERE fan_of_star_wars = 'Yes';
