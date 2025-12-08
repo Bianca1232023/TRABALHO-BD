@@ -1,17 +1,18 @@
--- TRIGGER 1: Audit de inserção em respostas
-CREATE OR REPLACE FUNCTION audit_respostas_insert()
+-- TRIGGER 1: Contar quantas vezes um filme foi visto
+CREATE OR REPLACE FUNCTION contar_filme_visto()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO audit_log (tabela, operacao, id_afetado, data_operacao)
-    VALUES ('respostas', 'INSERT', NEW.id, CURRENT_TIMESTAMP);
+    UPDATE film
+    SET film_name = film_name 
+    WHERE filmID = NEW.film_id;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_audit_respostas_insert
-AFTER INSERT ON respostas
+CREATE TRIGGER trigger_contar_filme_visto
+AFTER INSERT ON film_seen
 FOR EACH ROW
-EXECUTE FUNCTION audit_respostas_insert();
+EXECUTE FUNCTION contar_filme_visto();
 
 
 -- TRIGGER 2: Validação de ranking (deve estar entre 1 e 6)
@@ -31,18 +32,18 @@ FOR EACH ROW
 EXECUTE FUNCTION validar_ranking();
 
 
--- TRIGGER 3: Atualizar timestamp de modificação em respostas
-CREATE OR REPLACE FUNCTION atualizar_timestamp_respostas()
+-- TRIGGER 3: Garantir que character_opinion não fica com opinion vazia
+CREATE OR REPLACE FUNCTION validar_opinion_nao_vazia()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
+    IF NEW.opinion IS NULL OR TRIM(NEW.opinion) = '' THEN
+        RAISE EXCEPTION 'A opinião não pode estar vazia';
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-ALTER TABLE respostas ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-
-CREATE TRIGGER trigger_atualizar_timestamp_respostas
-BEFORE UPDATE ON respostas
+CREATE TRIGGER trigger_validar_opinion_nao_vazia
+BEFORE INSERT OR UPDATE ON character_opinion
 FOR EACH ROW
-EXECUTE FUNCTION atualizar_timestamp_respostas();
+EXECUTE FUNCTION validar_opinion_nao_vazia();

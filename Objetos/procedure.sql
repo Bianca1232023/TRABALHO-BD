@@ -16,12 +16,12 @@ CREATE OR REPLACE PROCEDURE inserir_respondente_com_validacao(
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Verificar se respondent_id já existe
-    IF NOT EXISTS (SELECT 1 FROM "RespondentID" WHERE respondent_id = p_respondent_id) THEN
-        INSERT INTO "RespondentID" (respondent_id) VALUES (p_respondent_id);
+
+    IF NOT EXISTS (SELECT 1 FROM "respondentid" WHERE respondent_id = p_respondent_id) THEN
+        INSERT INTO "respondentid" (respondent_id) VALUES (p_respondent_id);
     END IF;
     
-    -- Inserir resposta
+
     INSERT INTO respostas(
         respondent_id, gender, age, household_income, education, region,
         seen_any_star_wars, fan_of_star_wars, fan_of_startrek,
@@ -65,12 +65,12 @@ AS $$
 DECLARE
     v_count INT;
 BEGIN
-    -- Contar registros a serem deletados
+
     SELECT COUNT(*) INTO v_count
     FROM respostas
     WHERE respondent_id = p_respondent_id;
     
-    -- Deletar respostas (cascade deletará film_seen, film_ranking, character_opinion)
+
     DELETE FROM respostas
     WHERE respondent_id = p_respondent_id;
     
