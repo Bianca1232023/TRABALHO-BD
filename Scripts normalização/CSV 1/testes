@@ -10,3 +10,103 @@ SELECT
 SELECT DISTINCT respondent_id 
 FROM respostas
 LIMIT 5;
+
+-- Ver ranking médio de todos os filmes
+SELECT 
+    f.filmID,
+    f.film_name,
+    obter_ranking_medio_filme(f.filmID) AS ranking_medio
+FROM film f 
+ORDER BY f.filmID;
+
+-- Ver se o respondente quem é fan de Star Wars
+SELECT DISTINCT
+    r.respondent_id,
+    eh_fan_star_wars(r.respondent_id) AS eh_fan,
+    r.fan_of_star_wars AS resposta_original
+FROM respostas r
+LIMIT 10;
+
+
+-- Testar inserção de um novo respondente
+CALL inserir_respondente_com_validacao(
+    9999999999,  -- respondent_id (novo)
+    'Female',    -- gender
+    '30-44',     -- age
+    '$50,000 - $99,999',  -- household_income
+    'Bachelor degree',    -- education
+    'Northeast',  -- region
+    'Yes',        -- seen_any_star_wars
+    'Yes',        -- fan_of_star_wars
+    'No',         -- fan_of_startrek
+    'No',         -- fan_of_expanded_universe
+    'No',         -- familiar_with_expanded_universe
+    'Han Solo'    -- who_shot_first
+);
+
+-- Verificar se foi inserido
+SELECT * FROM respostas WHERE respondent_id = 9999999999;
+
+-- Primeiro, ver quantas opiniões "Very favorably" existem para o personagem 1 (Han Solo)
+SELECT COUNT(*) FROM character_opinion WHERE character_id = 1 AND opinion = 'Very favorably';
+
+-- Atualizar todas as opiniões "Very favorably" para "Favorably" do Han Solo
+CALL atualizar_opiniao_personagem_lote(
+    1,                    -- character_id (Han Solo)
+    'Very favorably',     -- opiniao_anterior
+    'Favorably'           -- opiniao_nova
+);
+
+-- Verificar a atualização
+SELECT COUNT(*) FROM character_opinion WHERE character_id = 1 AND opinion = 'Favorably';
+
+
+-- TESTE TRIGGER 2: Validação de Ranking
+
+
+-- 1. Tentar inserir ranking INVÁLIDO 
+INSERT INTO film_ranking (respondent_id, film_id, ranking)
+VALUES (16923, 1, 10);
+-- Vai gerar: ERROR: Ranking deve estar entre 1 e 6, valor fornecido: 10
+
+-- 2. Inserir ranking VÁLIDO 
+INSERT INTO film_ranking (respondent_id, film_id, ranking)
+VALUES (16923, 1, 3);
+
+-- 3. Ver o ranking inserido
+SELECT * FROM film_ranking WHERE respondent_id = 16923 AND film_id = 1;
+
+
+
+-- TESTE TRIGGER 3: Validação de Opinion
+
+
+-- 1. Tentar inserir opinion VAZIA 
+INSERT INTO character_opinion (respondent_id, character_id, opinion)
+VALUES (16923, 1, '');
+-- Vai gerar: ERROR: A opinião não pode estar vazia
+
+-- 2. Inserir opinion VÁLIDA 
+INSERT INTO character_opinion (respondent_id, character_id, opinion)
+VALUES (16923, 1, 'Very favorably');
+
+-- 3. Ver a opinion inserida
+SELECT * FROM character_opinion WHERE respondent_id = 16923 AND character_id = 1;
+
+
+
+-- TESTE TRIGGER 1: Contar filme visto
+
+
+-- 1. Ver quantos filmes foram vistos ANTES
+SELECT COUNT(*) as filmes_vistos_antes FROM film_seen WHERE respondent_id = 16923;
+
+-- 2. Inserir um novo filme visto 
+INSERT INTO film_seen (respondent_id, film_id, seen)
+VALUES (16923, 2, 'Yes');
+
+-- 3. Ver quantos filmes foram vistos DEPOIS
+SELECT COUNT(*) as filmes_vistos_depois FROM film_seen WHERE respondent_id = 16923;
+
+-- 4. Ver detalhes de todos os filmes vistos
+SELECT * FROM film_seen WHERE respondent_id = 16923;

@@ -17,8 +17,8 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     -- Verificar se respondent_id já existe
-    IF NOT EXISTS (SELECT 1 FROM "RespondentID" WHERE respondent_id = p_respondent_id) THEN
-        INSERT INTO "RespondentID" (respondent_id) VALUES (p_respondent_id);
+    IF NOT EXISTS (SELECT 1 FROM "respondentid" WHERE respondent_id = p_respondent_id) THEN
+        INSERT INTO "respondentid" (respondent_id) VALUES (p_respondent_id);
     END IF;
     
     -- Inserir resposta
