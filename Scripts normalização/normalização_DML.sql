@@ -29,7 +29,7 @@ SELECT
 	distinct
 	sw."respondentid"::bigint
 	FROM star_wars sw
-	WHERE sw."respondentid" IS NOT null
+	WHERE sw."respondentid" IS NOT null;
 
 
 INSERT INTO respostas(

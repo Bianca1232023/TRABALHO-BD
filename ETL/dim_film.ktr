@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>dim_film</name>
+    <description>Carrega dimensão de filmes</description>
+  </info>
+
+  <connection>
+    <name>starwars_postgres</name>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <server>localhost</server>
+    <database>star_wars</database>
+    <port>5432</port>
+    <username>root</username>
+    <password>root</password>
+  </connection>
+
+  <step>
+    <name>Table input - film</name>
+    <type>TableInput</type>
+    <connection>starwars_postgres</connection>
+    <sql>
+SELECT
+    f."filmID" AS film_id,
+    f.film_name
+FROM film f;
+    </sql>
+  </step>
+
+  <step>
+    <name>Table output - dim_film</name>
+    <type>TableOutput</type>
+    <connection>starwars_postgres</connection>
+    <schema>dw</schema>
+    <table>dim_film</table>
+    <truncate>Y</truncate>
+    <fields>
+      <field><column_name>film_id</column_name><stream_name>film_id</stream_name></field>
+      <field><column_name>film_name</column_name><stream_name>film_name</stream_name></field>
+    </fields>
+  </step>
+
+  <order>
+    <hop>
+      <from>Table input - film</from>
+      <to>Table output - dim_film</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+</transformation>

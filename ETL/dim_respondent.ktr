@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>dim_respondent</name>
+    <description>Carrega dimensão de respondentes</description>
+  </info>
+
+  <connection>
+    <name>starwars_postgres</name>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <server>localhost</server>
+    <database>star_wars</database>
+    <port>5432</port>
+    <username>root</username>
+    <password>root</password>
+  </connection>
+
+  <!-- STEP: Table Input -->
+  <step>
+    <name>Table input - respostas</name>
+    <type>TableInput</type>
+    <connection>starwars_postgres</connection>
+    <sql>
+SELECT
+    r.respondent_id,
+    r.gender,
+    r.age::text AS age_group,
+    r.household_income,
+    r.education,
+    r.region
+FROM respostas r;
+    </sql>
+    <rowlimit>0</rowlimit>
+  </step>
+
+  <!-- STEP: Table Output -->
+  <step>
+    <name>Table output - dim_respondent</name>
+    <type>TableOutput</type>
+    <connection>starwars_postgres</connection>
+    <schema>dw</schema>
+    <table>dim_respondent</table>
+    <truncate>Y</truncate>
+    <fields>
+      <field><column_name>respondent_id</column_name><stream_name>respondent_id</stream_name></field>
+      <field><column_name>gender</column_name><stream_name>gender</stream_name></field>
+      <field><column_name>age_group</column_name><stream_name>age_group</stream_name></field>
+      <field><column_name>household_income</column_name><stream_name>household_income</stream_name></field>
+      <field><column_name>education</column_name><stream_name>education</stream_name></field>
+      <field><column_name>region</column_name><stream_name>region</stream_name></field>
+    </fields>
+  </step>
+
+  <!-- Hop -->
+  <order>
+    <hop>
+      <from>Table input - respostas</from>
+      <to>Table output - dim_respondent</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+</transformation>

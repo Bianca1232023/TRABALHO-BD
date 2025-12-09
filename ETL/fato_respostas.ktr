@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>fato_respostas</name>
+    <description>Carrega fato com opiniões, filmes vistos e rankings</description>
+  </info>
+
+  <connection>
+    <name>starwars_postgres</name>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <server>localhost</server>
+    <database>star_wars</database>
+    <port>5432</port>
+    <username>root</username>
+    <password>root</password>
+  </connection>
+
+  <step>
+    <name>Table input - fato_respostas</name>
+    <type>TableInput</type>
+    <connection>starwars_postgres</connection>
+    <sql>
+-- Parte 1: Filmes (seen + ranking)
+SELECT
+    r.respondent_id,
+    fs.film_id,
+    NULL::INT              AS character_id,
+    NULL::VARCHAR(50)      AS opinion,
+    CASE
+        WHEN LOWER(fs.seen) IN ('yes', 'y', 'true', '1') THEN TRUE
+        ELSE FALSE
+    END                    AS seen,
+    fr.ranking,
+    CASE
+        WHEN LOWER(r.fan_of_star_wars) IN ('yes','y','true','1')
+            THEN TRUE ELSE FALSE
+    END                    AS fan_star_wars,
+    CASE
+        WHEN LOWER(r.fan_of_startrek) IN ('yes','y','true','1')
+            THEN TRUE ELSE FALSE
+    END                    AS fan_star_trek
+FROM respostas r
+LEFT JOIN film_seen fs
+       ON fs.respondent_id = r.id
+LEFT JOIN film_ranking fr
+       ON fr.respondent_id = r.id
+      AND fr.film_id = fs.film_id
+
+UNION ALL
+
+-- Parte 2: Personagens (opinião)
+SELECT
+    r.respondent_id,
+    NULL::INT              AS film_id,
+    co.character_id,
+    COALESCE(co.opinion, NULL)::VARCHAR(50) AS opinion,
+    NULL::BOOLEAN          AS seen,
+    NULL::INT              AS ranking,
+    CASE
+        WHEN LOWER(r.fan_of_star_wars) IN ('yes','y','true','1')
+            THEN TRUE ELSE FALSE
+    END                    AS fan_star_wars,
+    CASE
+        WHEN LOWER(r.fan_of_startrek) IN ('yes','y','true','1')
+            THEN TRUE ELSE FALSE
+    END                    AS fan_star_trek
+FROM respostas r
+JOIN character_opinion co
+  ON co.respondent_id = r.id;
+    </sql>
+  </step>
+
+  <step>
+    <name>Table output - fato_respostas</name>
+    <type>TableOutput</type>
+    <connection>starwars_postgres</connection>
+    <schema>dw</schema>
+    <table>fato_respostas</table>
+    <truncate>Y</truncate>
+    <fields>
+      <field><column_name>respondent_id</column_name><stream_name>respondent_id</stream_name></field>
+      <field><column_name>film_id</column_name><stream_name>film_id</stream_name></field>
+      <field><column_name>character_id</column_name><stream_name>character_id</stream_name></field>
+      <field><column_name>opinion</column_name><stream_name>opinion</stream_name></field>
+      <field><column_name>seen</column_name><stream_name>seen</stream_name></field>
+      <field><column_name>ranking</column_name><stream_name>ranking</stream_name></field>
+      <field><column_name>fan_star_wars</column_name><stream_name>fan_star_wars</stream_name></field>
+      <field><column_name>fan_star_trek</column_name><stream_name>fan_star_trek</stream_name></field>
+    </fields>
+  </step>
+
+  <order>
+    <hop>
+      <from>Table input - fato_respostas</from>
+      <to>Table output - fato_respostas</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+</transformation>
