@@ -2,7 +2,7 @@
 <transformation>
   <info>
     <name>dim_character</name>
-    <description>Carrega dimensão de personagens</description>
+    <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
@@ -417,7 +417,7 @@
     <shared_objects_file/>
     <capture_step_performance>N</capture_step_performance>
     <step_performance_capturing_delay>1000</step_performance_capturing_delay>
-    <step_performance_capturing_size_limit/>
+    <step_performance_capturing_size_limit>100</step_performance_capturing_size_limit>
     <dependencies>
     </dependencies>
     <partitionschemas>
@@ -426,17 +426,17 @@
     </slaveservers>
     <clusterschemas>
     </clusterschemas>
-    <created_user/>
-    <created_date>2025/12/09 01:40:18.437</created_date>
-    <modified_user/>
-    <modified_date>2025/12/09 01:40:18.437</modified_date>
-    <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
+    <created_user>-</created_user>
+    <created_date>2025/12/10 00:48:59.775</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2025/12/10 00:48:59.775</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <connection>
-    <name>starwars_postgres</name>
+    <name>star_wars</name>
     <server>localhost</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
@@ -457,7 +457,7 @@
         <attribute>N</attribute>
       </attribute>
       <attribute>
-        <code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code>
+        <code>IS_CLUSTERED</code>
         <attribute>N</attribute>
       </attribute>
       <attribute>
@@ -465,16 +465,20 @@
         <attribute>5432</attribute>
       </attribute>
       <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
         <code>QUOTE_ALL_FIELDS</code>
         <attribute>N</attribute>
       </attribute>
       <attribute>
         <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
-        <attribute>N</attribute>
+        <attribute>Y</attribute>
       </attribute>
       <attribute>
         <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
-        <attribute>N</attribute>
+        <attribute>Y</attribute>
       </attribute>
       <attribute>
         <code>USE_POOLING</code>
@@ -484,36 +488,82 @@
   </connection>
   <order>
     <hop>
-      <from>Table input - character_film</from>
-      <to>Table output - dim_character</to>
+      <from>Table input</from>
+      <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Table input - character_film</name>
+    <name>Table input</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
-    <copies/>
+    <copies>1</copies>
     <partitioning>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>starwars_postgres</connection>
-    <sql>
-SELECT
+    <connection>star_wars</connection>
+    <sql>SELECT
     c.character_id,
     c.character_name
 FROM character_film c;
-    </sql>
-    <limit/>
+</sql>
+    <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
     <variables_active>N</variables_active>
     <lazy_conversion_active>N</lazy_conversion_active>
     <cached_row_meta_active>N</cached_row_meta_active>
-    <row-meta/>
+    <row-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>character_id</name>
+        <length>9</length>
+        <precision>0</precision>
+        <origin>Table input</origin>
+        <comments>character_id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>pt_BR</date_format_locale>
+        <date_format_timezone>America/Sao_Paulo</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>character_name</name>
+        <length>100</length>
+        <precision>-1</precision>
+        <origin>Table input</origin>
+        <comments>character_name</comments>
+        <conversion_Mask/>
+        <decimal_symbol>,</decimal_symbol>
+        <grouping_symbol>.</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>pt_BR</date_format_locale>
+        <date_format_timezone>America/Sao_Paulo</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -523,37 +573,37 @@ FROM character_film c;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>0</xloc>
-      <yloc>0</yloc>
-      <draw>N</draw>
+      <xloc>208</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Table output - dim_character</name>
+    <name>Table output</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
-    <copies/>
+    <copies>1</copies>
     <partitioning>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>starwars_postgres</connection>
+    <connection>star_wars</connection>
     <schema>dw</schema>
     <table>dim_character</table>
-    <commit/>
-    <truncate>Y</truncate>
+    <commit>1000</commit>
+    <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>N</specify_fields>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
     <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>N</partitioning_monthly>
+    <partitioning_monthly>Y</partitioning_monthly>
     <tablename_in_field>N</tablename_in_field>
     <tablename_field/>
-    <tablename_in_table>N</tablename_in_table>
+    <tablename_in_table>Y</tablename_in_table>
     <return_keys>N</return_keys>
     <return_field/>
     <fields>
@@ -575,9 +625,9 @@ FROM character_film c;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>0</xloc>
-      <yloc>0</yloc>
-      <draw>N</draw>
+      <xloc>400</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>

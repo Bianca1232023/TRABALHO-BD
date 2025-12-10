@@ -2,8 +2,11 @@ DROP TABLE IF EXISTS dw.fact_opinion CASCADE;
 DROP TABLE IF EXISTS dw.dim_respondent CASCADE;
 DROP TABLE IF EXISTS dw.dim_film CASCADE;
 DROP TABLE IF EXISTS dw.dim_character CASCADE;
+DROP TABLE IF EXISTS dw.fato_respostas CASCADE;
+DROP TABLE IF EXISTS dw.etl_execution CASCADE;
+DROP TABLE IF EXISTS dw.action_type CASCADE;
 
-CREATE TYPE action_type AS ENUM ('I','U','D');
+CREATE TYPE dw.action_type AS ENUM ('I','U','D');
 
 CREATE TABLE dw.dim_respondent (
     id SERIAL PRIMARY KEY,
@@ -61,7 +64,7 @@ CREATE INDEX ix_fato_respostas_seen ON dw.fato_respostas (seen);
 CREATE INDEX ix_fato_respostas_fanwars ON dw.fato_respostas (fan_star_wars);
 CREATE INDEX ix_fato_respostas_fantrek ON dw.fato_respostas (fan_star_trek);
 
-CREATE TABLE etl_execution (
+CREATE TABLE dw.etl_execution (
     process VARCHAR(100) PRIMARY KEY,
     last_execution TIMESTAMP
 );
