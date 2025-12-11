@@ -200,8 +200,27 @@ JOIN (SELECT DISTINCT respondent_id, fan_star_trek FROM dw.fato_respostas) f USI
 GROUP BY r.household_income
 ORDER BY r.household_income;
 
-/* 18. Grupo com mais desconhecimento de personagens */
-
+/* 18. Qual faixa etária tem maior proporção de fãs de Star Wars? */
+WITH total_por_idade AS (
+    SELECT age_group, COUNT(*) AS total
+    FROM dw.dim_respondent
+    GROUP BY age_group
+),
+fans_por_idade AS (
+    SELECT r.age_group, COUNT(DISTINCT f.respondent_id) AS fans
+    FROM dw.fato_respostas f
+    JOIN dw.dim_respondent r USING (respondent_id)
+    WHERE f.fan_star_wars = TRUE
+    GROUP BY r.age_group
+)
+SELECT
+    t.age_group,
+    COALESCE(f.fans, 0) AS total_fans,
+    t.total AS total_respondentes,
+    ROUND(COALESCE(f.fans::numeric / t.total, 0), 4) AS proporcao_fas
+FROM total_por_idade t
+LEFT JOIN fans_por_idade f USING (age_group)
+ORDER BY proporcao_fas DESC;
 
 /* 19. Quem vê mais filmes por renda */
 SELECT r.household_income, COUNT(*) AS total_seen
