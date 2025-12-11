@@ -37,6 +37,10 @@
         <attribute>N</attribute>
       </attribute>
       <attribute>
+        <code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
         <code>PORT_NUMBER</code>
         <attribute>5432</attribute>
       </attribute>
@@ -338,30 +342,6 @@
   <shared_objects_file/>
   <entries>
     <entry>
-      <name>Limpar DW (SQL)</name>
-      <description/>
-      <type>SQL</type>
-      <attributes/>
-      <sql>TRUNCATE TABLE
-    dw.fato_respostas,
-    dw.dim_film,
-    dw.dim_character,
-    dw.dim_respondent
-RESTART IDENTITY;
-</sql>
-      <useVariableSubstitution>F</useVariableSubstitution>
-      <sqlfromfile>F</sqlfromfile>
-      <sqlfilename/>
-      <sendOneStatement>F</sendOneStatement>
-      <connection>star_wars</connection>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>288</xloc>
-      <yloc>352</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
       <name>Carregar dim_film</name>
       <description/>
       <type>TRANS</type>
@@ -396,8 +376,8 @@ RESTART IDENTITY;
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>432</xloc>
-      <yloc>352</yloc>
+      <xloc>400</xloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -435,8 +415,8 @@ RESTART IDENTITY;
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>592</xloc>
-      <yloc>352</yloc>
+      <xloc>560</xloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -474,8 +454,8 @@ RESTART IDENTITY;
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>784</xloc>
-      <yloc>352</yloc>
+      <xloc>752</xloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -513,8 +493,8 @@ RESTART IDENTITY;
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>992</xloc>
-      <yloc>352</yloc>
+      <xloc>960</xloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -535,8 +515,8 @@ DO UPDATE SET last_execution = EXCLUDED.last_execution;
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1200</xloc>
-      <yloc>352</yloc>
+      <xloc>1168</xloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -557,21 +537,12 @@ DO UPDATE SET last_execution = EXCLUDED.last_execution;
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>144</xloc>
-      <yloc>352</yloc>
+      <xloc>240</xloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
   </entries>
   <hops>
-    <hop>
-      <from>Limpar DW (SQL)</from>
-      <to>Carregar dim_film</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
     <hop>
       <from>Carregar dim_film</from>
       <to>Carregar dim_character</to>
@@ -610,7 +581,7 @@ DO UPDATE SET last_execution = EXCLUDED.last_execution;
     </hop>
     <hop>
       <from>Start</from>
-      <to>Limpar DW (SQL)</to>
+      <to>Carregar dim_film</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
