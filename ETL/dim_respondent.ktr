@@ -993,23 +993,23 @@ FROM respostas r;
     <fields>
       <field>
         <source_value>Less than high school</source_value>
-        <target_value>LESS THAN HIGH SCHOOL</target_value>
+        <target_value>LHS</target_value>
       </field>
       <field>
         <source_value>Some college or Associate degree</source_value>
-        <target_value>SOME COLLEGE/ASSOCIATE</target_value>
+        <target_value>AS</target_value>
       </field>
       <field>
         <source_value>High school degree</source_value>
-        <target_value>HIGH SCHOOL</target_value>
+        <target_value>HS</target_value>
       </field>
       <field>
         <source_value>Bachelor degree</source_value>
-        <target_value>BACHELOR</target_value>
+        <target_value>BA</target_value>
       </field>
       <field>
         <source_value>Graduate degree</source_value>
-        <target_value>GRADUATE</target_value>
+        <target_value>GR</target_value>
       </field>
     </fields>
     <attributes/>
