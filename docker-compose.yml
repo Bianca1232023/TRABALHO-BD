@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: trabalho_bd_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: star_wars
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - trabalho_bd_net
+
+volumes:
+  pgdata:
+
+networks:
+  trabalho_bd_net:
