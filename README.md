@@ -1,53 +1,67 @@
 # ⭐ **STAR WARS – Projeto de Banco de Dados 2**
 
-Este projeto tem como objetivo desenvolver um ambiente completo de banco de dados utilizando uma base pública da franquia **Star Wars**, composta por informações demográficas dos entrevistados, preferências de filmes, opiniões sobre personagens e rankings individuais.
+Este projeto tem como objetivo construir um ambiente completo de banco de dados utilizando uma base pública da franquia Star Wars, contendo informações demográficas dos entrevistados, preferências de filmes, opiniões sobre personagens e rankings individuais.
 
-Ao longo do desenvolvimento, foram realizadas etapas essenciais de engenharia de dados, incluindo:
+O desenvolvimento envolveu todas as etapas da engenharia de dados, desde a análise da base original até a criação de um Data Warehouse (DW) para análises multidimensionais.
 
-* análise da estrutura original da base;
-* criação de um dicionário de dados inicial;
-* normalização e reorganização das tabelas;
-* construção de índices para otimização de desempenho;
-* desenvolvimento de automatizações (triggers, views, functions, procedures);
-* implementação de um Data Warehouse utilizando modelagem dimensional.
 ---
 
 ## 📘 **Dicionário de Dados Inicial**
 
-O dicionário inicial foi desenvolvido a partir da tabela original `star_wars`, que continha todas as respostas agregadas em uma única estrutura. Durante a análise exploratória, foram identificados diversos problemas, como:
+A base original star_wars apresentava diversos problemas:
 
-* ausência de chaves primárias e estrangeiras;
-* colunas sem nome (*Unnamed*);
-* mistura de informações demográficas, opiniões e rankings;
-* campos agregados de forma inadequada;
-* tipos de dados pouco específicos ou genéricos.
+* Ausência de chaves primárias e estrangeiras
+* Colunas sem nome (Unnamed)
+* Mistura de informações demográficas, opiniões e rankings
+* Campos agregados de forma inadequada;
+* Tipos de dados genéricos
+
+O dicionário de dados inicial foi criado para compreender a estrutura original e orientar a normalização*.
+
+**Exemplo de algumas colunas originais:**
+
+| Coluna                                     | Tipo    | Descrição                                   | Observações                                 |
+| ------------------------------------------ | ------- | ------------------------------------------- | ------------------------------------------- |
+| RespondentID                               | float   | Identificador do respondente                | Não era chave primária                      |
+| Have you seen any of the 6 films...?       | varchar | Indica se o participante já viu algum filme | Renomeada na normalização                   |
+| Which of the following Star Wars films...? | varchar | Filmes assistidos                           | Distribuídos em múltiplas colunas (Unnamed) |
+| Please rank the Star Wars films...         | varchar | Ranking de filmes                           | Distribuído em várias colunas               |
+| Character opinions                         | varchar | Avaliação de personagens                    | Distribuída em várias colunas Unnamed:16–28 |
+| Gender                                     | varchar | Gênero do participante                      | “Male”, “Female”                            |
+| Age                                        | varchar | Faixa etária                                | “18–29”, “30–44”, “45–60”                   |
+| Household Income                           | varchar | Faixa de renda                              | Ex.: “$0–24,999”                            |
+| Education                                  | varchar | Escolaridade                                | Ex.: “High school degree”                   |
+| Location                                   | varchar | Região censitária                           | Ex.: “South Atlantic”                       |
 
 ---
 
 ## 🛠️ **Análise da Base, Normalização e Indexação**
 
-A base foi reorganizada para resolver inconsistências, separar corretamente os domínios e possibilitar consultas mais rápidas e confiáveis.
+A base foi reorganizada para corrigir inconsistências e possibilitar consultas rápidas e confiáveis.
 
-### ✔ Normalização aplicada
+### ✔ **Normalização aplicada**
 
-Incluiu:
+* Criação de tabelas específicas
+* Eliminação de redundâncias
+* Definição de chaves primárias e estrangeiras
+* Padronização de tipos
+* Separação de entidades e relacionamentos.
 
-* criação de tabelas específicas (respondentes, filmes, personagens, respostas, rankings etc.);
-* eliminação completa de redundâncias;
-* definição clara de chaves primárias e estrangeiras;
-* padronização de tipos e criação de ENUMs (ex.: faixas etárias);
-* separação adequada de entidades e relacionamentos.
+### ✔ **Principais tabelas criadas**
 
-### ✔ Principais tabelas resultantes
+| Tabela            | Descrição                                   |
+| ----------------- | ------------------------------------------- |
+| respondentid      | Identificador original do respondente       |
+| respostas         | respostas gerais       |
+| film              | Catálogo de filmes                          |
+| film_seen         | Filmes assistidos por cada respondente      |
+| film_ranking      | Ranking de filmes dado por cada respondente |
+| character_film    | Catálogo de personagens avaliados           |
+| character_opinion | Avaliações de personagens por respondente   |
 
-* **respondentid** — identificador original de cada entrevistado
-* **respostas** — características demográficas e respostas gerais
-* **film / film_seen / film_ranking** — catálogo e interações com os filmes
-* **character_film / character_opinion** — personagens e avaliações
+### ✔ **Indexação**
 
-### ✔ Indexação
-
-Foram implementados índices para acelerar consultas, especialmente em:
+Foram criados índices para otimizar consultas, alguns exemplos:
 
 * `film_seen`
 * `film_ranking`
@@ -57,47 +71,52 @@ Foram implementados índices para acelerar consultas, especialmente em:
 
 ## ⚙️ **Automatizações no PostgreSQL**
 
-Para tornar o ambiente mais inteligente, estável e automatizado, foram desenvolvidas as seguintes estruturas:
-
 ### 🔹 **Triggers**
 
-* validações automáticas
-* auditoria de alterações
-* preenchimento automático de campos
+* Validações automáticas (`trigger_validar_ranking`, `trigger_validar_opinion_nao_vazia`)
+* Auditoria de alterações (`trigger_caracter`, `trigger_respondent`)
+* Atualização de contadores (`trigger_contar_filme_visto`)
 
 ### 🔹 **Functions**
 
-* cálculos padronizados
-* regras de negócio reutilizáveis
+* `contar_filmes_vistos()` – total de filmes vistos por respondente
+* `obter_ranking_medio_filme()` – ranking médio de filmes
+* `eh_fan_star_wars()` – identifica fãs da franquia
 
 ### 🔹 **Views**
 
-* consultas complexas simplificadas
-* apoio direto a análises exploratórias
+* `v_respondentes_por_regiao` – estatísticas por região
+* `v_ranking_medio_filmes` – ranking médio de filmes
+* `v_fans_vs_nao_fans` – comparativo entre fãs e não-fãs
 
 ### 🔹 **Procedures**
 
-* rotinas de carga
-* limpeza e manutenção
-* automação de processos repetitivos
+* `inserir_respondente_com_validacao()` – cadastro seguro de respondentes
+* `atualizar_opiniao_personagem_lote()` – atualização massiva de opiniões
+* `limpar_respondente()` – exclusão completa de respostas 
 
 ---
 
 ## 📊 **Modelagem do Data Warehouse (DW)**
 
-O DW foi projetado utilizando **modelagem dimensional**, seguindo um **Esquema Estrela** adequado para análises de preferências e comportamentos dos entrevistados.
+O DW utiliza modelagem dimensional permitindo análises de comportamento e preferências.
 
-### ❓ Perguntas de negócio atendidas
+### ✅ **Tabela Fato**
 
-* Qual filme recebe as melhores avaliações em cada faixa etária?
-* Quais personagens possuem os maiores índices de aprovação?
-* Como variam as preferências entre diferentes regiões e perfis demográficos?
+* `Fato_OpiniaoFilmes` – consolida opiniões, rankings e hábitos de consumo de mídia.
 
-### 📁 Componentes principais
+### ✅ **Dimensões**
 
-* **Tabela Fato:** `Fato_OpiniaoFilmes`
-* **Dimensões:**
+* `Dim_Respondente` – gênero, faixa etária, renda, escolaridade, região
+* `Dim_Filme` – catálogo de filmes
+* `Dim_Personagem` – personagens avaliados.
 
-  * `Dim_Filme`
-  * `Dim_Respondente`
-  * `Dim_Personagem`
+### ✅ **Perguntas de negócio atendidas**
+
+* Quais filmes são mais assistidos por faixa etária?
+* Quais personagens têm maior aprovação?
+* Quantos fãs de Star Wars também são fãs de Star Trek?
+
+### ✅ **Triggers no DW**
+
+* `trigger_fato`, `trigger_filme`, `trigger_respondent`, `trigger_caracter` – garantem atualização automática de dimensões e fatos, mantendo histórico e integridade.

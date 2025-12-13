@@ -52,7 +52,7 @@ SELECT
         WHEN TRIM(sw.age) = '18-29' THEN '18-29'::idade
         WHEN TRIM(sw.age) = '30-44' THEN '30-44'::idade
         WHEN TRIM(sw.age) = '45-60' THEN '45-60'::idade
-        WHEN TRIM(sw.age) = '>60'   THEN '>60'::idade
+        WHEN TRIM(sw.age) = '> 60'   THEN '>60'::idade
         ELSE NULL
     END AS age,
     sw."Household Income",
