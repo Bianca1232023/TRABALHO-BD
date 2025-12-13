@@ -1,16 +1,3 @@
--- =========================================================
--- ETL COMPLETO (DO ZERO) - STAR WARS TABELONA -> MODELO NORMALIZADO
--- =========================================================
--- Premissas:
--- - tabelona: star_wars
--- - DDL final já criado
--- - objetivo: popular todas as tabelas do modelo normalizado
--- =========================================================
-
-
--- =========================================================
--- 1) DOMÍNIOS FIXOS
--- =========================================================
 
 insert into gender (description)
 select distinct trim(sw."gender")
@@ -62,11 +49,6 @@ where not exists (
       and hi.income_range_end   = v.e
 );
 
-
--- =========================================================
--- 2) RESPONDENT
--- =========================================================
-
 insert into respondent (
     id,
     gender_id,
@@ -108,10 +90,6 @@ where sw."respondentid" is not null
 on conflict (id) do nothing;
 
 
--- =========================================================
--- 3) FILM (lista de filmes a partir das colunas de seleção)
--- =========================================================
-
 insert into film (name)
 select distinct film_name
 from (
@@ -126,10 +104,6 @@ where film_name is not null
   and trim(film_name) <> ''
 on conflict (name) do nothing;
 
-
--- =========================================================
--- 4) FILM_SEEN (existência da linha = viu)
--- =========================================================
 
 insert into film_seen (respondent_id, film_id)
 select distinct
@@ -150,9 +124,6 @@ join film f
 on conflict do nothing;
 
 
--- =========================================================
--- 5) FILM_RANKING
--- =========================================================
 
 insert into film_ranking (respondent_id, film_id, ranking)
 select
@@ -192,9 +163,7 @@ where
 on conflict do nothing;
 
 
--- =========================================================
--- 6) CHARACTER (lista fixa)
--- =========================================================
+
 
 insert into character (name) values
 ('Han Solo'),
@@ -214,9 +183,7 @@ insert into character (name) values
 on conflict (name) do nothing;
 
 
--- =========================================================
--- 7) QUESTIONS (EAV)
--- =========================================================
+
 
 insert into question (statement)
 select q
@@ -234,11 +201,7 @@ where not exists (
 );
 
 
--- =========================================================
--- 8) ANSWER_OPTION (EAV)
--- =========================================================
 
--- YES / NO
 insert into answer_option (question_id, code, label)
 select q.id, o.code, o.label
 from question q
@@ -252,7 +215,7 @@ where q.statement in (
 )
 on conflict (question_id, code) do nothing;
 
--- WHO SHOT FIRST
+
 insert into answer_option (question_id, code, label)
 select q.id, o.code, o.label
 from question q
@@ -264,7 +227,7 @@ cross join (values
 where q.statement = 'Which character shot first?'
 on conflict (question_id, code) do nothing;
 
--- CHARACTER OPINION (labels exatamente como aparecem no teu print)
+
 insert into answer_option (question_id, code, label)
 select q.id, o.code, o.label
 from question q
@@ -280,11 +243,6 @@ where q.statement = 'Character opinion'
 on conflict (question_id, code) do nothing;
 
 
--- =========================================================
--- 9) ANSWER (EAV) - MIGRAR TODAS AS PERGUNTAS DO CSV
--- =========================================================
-
--- Have you seen any...
 insert into answer (respondent_id, question_id, option_id)
 select r.id, q.id, ao.id
 from star_wars sw
@@ -297,7 +255,7 @@ where sw."Have you seen any of the 6 films in the Star Wars franchise?" is not n
   and trim(sw."Have you seen any of the 6 films in the Star Wars franchise?") <> 'Response'
 on conflict do nothing;
 
--- Fan of Star Wars
+
 insert into answer (respondent_id, question_id, option_id)
 select r.id, q.id, ao.id
 from star_wars sw
@@ -310,7 +268,7 @@ where sw."Do you consider yourself to be a fan of the Star Wars film fran" is no
   and trim(sw."Do you consider yourself to be a fan of the Star Wars film fran") <> 'Response'
 on conflict do nothing;
 
--- Fan of Star Trek
+
 insert into answer (respondent_id, question_id, option_id)
 select r.id, q.id, ao.id
 from star_wars sw
@@ -323,7 +281,7 @@ where sw."Do you consider yourself to be a fan of the Star Trek franchise" is no
   and trim(sw."Do you consider yourself to be a fan of the Star Trek franchise") <> 'Response'
 on conflict do nothing;
 
--- Fan of Expanded Universe
+
 insert into answer (respondent_id, question_id, option_id)
 select r.id, q.id, ao.id
 from star_wars sw
@@ -336,7 +294,7 @@ where sw."Do you consider yourself to be a fan of the Expanded Universe?" is not
   and trim(sw."Do you consider yourself to be a fan of the Expanded Universe?") <> 'Response'
 on conflict do nothing;
 
--- Familiar with Expanded Universe
+
 insert into answer (respondent_id, question_id, option_id)
 select r.id, q.id, ao.id
 from star_wars sw
@@ -349,7 +307,7 @@ where sw."Are you familiar with the Expanded Universe?" is not null
   and trim(sw."Are you familiar with the Expanded Universe?") <> 'Response'
 on conflict do nothing;
 
--- Who shot first
+
 insert into answer (respondent_id, question_id, option_id)
 select r.id, q.id, ao.id
 from star_wars sw
@@ -362,13 +320,6 @@ where sw."Which character shot first?" is not null
   and trim(sw."Which character shot first?") <> 'Response'
 on conflict do nothing;
 
-
--- =========================================================
--- 10) CHARACTER_OPINION (CORREÇÃO DEFINITIVA)
--- =========================================================
--- O dataset é sujo: nas colunas de "opinião" aparecem também nomes de personagens.
--- Este insert só insere quando a célula casar com UMA OPÇÃO VÁLIDA (answer_option),
--- ou seja: se for nome de personagem, não casa e não entra.
 
 with q as (
     select q.id

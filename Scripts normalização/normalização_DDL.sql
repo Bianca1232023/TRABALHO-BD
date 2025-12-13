@@ -1,7 +1,3 @@
--- =========================================================
--- DOMÍNIOS FIXOS
--- =========================================================
-
 create table region (
     id int generated always as identity primary key,
     name varchar(100) not null unique
@@ -29,9 +25,7 @@ create table education_level (
     name varchar(100) not null unique
 );
 
--- =========================================================
--- RESPONDENTE
--- =========================================================
+
 
 create table respondent (
     id bigint primary key,
@@ -42,9 +36,7 @@ create table respondent (
     region_id int references region(id)
 );
 
--- =========================================================
--- PERGUNTAS E OPÇÕES (EAV)
--- =========================================================
+
 
 create table question (
     id bigint generated always as identity primary key,
@@ -66,9 +58,7 @@ create table answer (
     primary key (respondent_id, question_id)
 );
 
--- =========================================================
--- FILMES
--- =========================================================
+
 
 create table film (
     id int generated always as identity primary key,
@@ -88,11 +78,9 @@ create table film_ranking (
     primary key (respondent_id, film_id)
 );
 
--- =========================================================
--- PERSONAGENS
--- =========================================================
 
-create table character (
+
+create table character(
     id int generated always as identity primary key,
     name varchar(100) not null unique
 );
