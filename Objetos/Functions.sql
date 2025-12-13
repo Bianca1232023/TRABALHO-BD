@@ -1,30 +1,23 @@
--- FUNCTION 1: Contar filmes vistos por um respondente
 CREATE OR REPLACE FUNCTION contar_filmes_vistos(p_respondent_id BIGINT)
 RETURNS INT AS $$
 DECLARE
-    v_count INT;
-    v_is_internal BOOLEAN;
+    v_exists BOOLEAN;
 BEGIN
-    SELECT EXISTS(SELECT 1 FROM respostas WHERE id = p_respondent_id) INTO v_is_internal;
+    SELECT EXISTS(
+        SELECT 1 FROM respondent WHERE id = p_respondent_id
+    ) INTO v_exists;
 
-    IF v_is_internal THEN
-        SELECT COUNT(*) INTO v_count
-        FROM film_seen
-        WHERE respondent_id = p_respondent_id
-          AND seen IS NOT NULL
-          AND TRIM(seen) <> '';
-    ELSE
-        SELECT COUNT(*) INTO v_count
-        FROM film_seen fs
-        JOIN respostas r ON fs.respondent_id = r.id
-        WHERE r.respondent_id = p_respondent_id
-          AND fs.seen IS NOT NULL
-          AND TRIM(fs.seen) <> '';
+    IF NOT v_exists THEN
+        RETURN 0;
     END IF;
 
-    RETURN COALESCE(v_count, 0);
+    RETURN (
+        SELECT COUNT(*)
+        FROM film_seen
+        WHERE respondent_id = p_respondent_id
+    );
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE;
 
 
 -- FUNCTION 2: Obter ranking médio de um filme
@@ -33,27 +26,36 @@ RETURNS NUMERIC AS $$
 DECLARE
     v_media NUMERIC;
 BEGIN
-    SELECT AVG(ranking::NUMERIC) INTO v_media
-    FROM film_ranking
-    WHERE film_id = p_film_id
-    AND ranking IS NOT NULL;
-    
+    SELECT AVG(fr.ranking::NUMERIC) INTO v_media
+    FROM film_ranking fr
+    WHERE fr.film_id = p_film_id;
+
     RETURN COALESCE(v_media, 0);
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE;
 
 
--- FUNCTION 3: Verificar se respondente é fan de Star Wars
 CREATE OR REPLACE FUNCTION eh_fan_star_wars(p_respondent_id BIGINT)
 RETURNS BOOLEAN AS $$
 DECLARE
-    v_eh_fan VARCHAR;
+    v_question_id BIGINT;
 BEGIN
-    SELECT fan_of_star_wars INTO v_eh_fan
-    FROM respostas
-    WHERE respondent_id = p_respondent_id
+    SELECT id INTO v_question_id
+    FROM question
+    WHERE statement = 'Do you consider yourself to be a fan of the Star Wars film franchise?'
     LIMIT 1;
-    
-    RETURN COALESCE(v_eh_fan = 'Yes', FALSE);
+
+    IF v_question_id IS NULL THEN
+        RETURN FALSE;
+    END IF;
+
+    RETURN EXISTS (
+        SELECT 1
+        FROM answer a
+        JOIN answer_option ao ON ao.id = a.option_id
+        WHERE a.respondent_id = p_respondent_id
+          AND a.question_id = v_question_id
+          AND UPPER(ao.label) = 'YES'
+    );
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE;

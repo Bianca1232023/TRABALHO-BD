@@ -1,141 +1,198 @@
--- Ver quantos filmes o respondente 3292879998 viu
-SELECT contar_filmes_vistos(3292879616) as total_filmes_vistos;
+/*
+TESTES PARA OBJETOS DO BANCO (Functions, Procedures, Views e Triggers)
+Instruções:
+ - Execute cada bloco em uma sessão psql/pgAdmin.
+ - Os testes criam um respondent_id fictício = 9999999999.
+ - Finalize com o bloco de limpeza para manter o banco consistente.
+*/
 
--- Ver resultado com mais detalhes
+-- =============================================================
+-- 1) FUNCTIONS
+-- =============================================================
+
+-- 1.1 contar_filmes_vistos -> primeiros 5 respondentes
 SELECT 
-    3292879872 as respondent_id,
-    contar_filmes_vistos(3292879616) as total_filmes_vistos;
-
--- Rodar para vários respondentes
-SELECT DISTINCT respondent_id 
-FROM respostas
+    r.id AS respondent_id,
+    contar_filmes_vistos(r.id) AS total_filmes_vistos
+FROM respondent r
+ORDER BY r.id
 LIMIT 5;
 
--- Ver ranking médio de todos os filmes
+-- 1.2 obter_ranking_medio_filme -> todos os filmes
 SELECT 
-    f.filmID,
-    f.film_name,
-    obter_ranking_medio_filme(f.filmID) AS ranking_medio
-FROM film f 
-ORDER BY f.filmID;
+    f.id,
+    f.name,
+    obter_ranking_medio_filme(f.id) AS ranking_medio
+FROM film f
+ORDER BY f.id;
 
--- Ver se o respondente quem é fan de Star Wars
-SELECT DISTINCT
-    r.respondent_id,
-    eh_fan_star_wars(r.respondent_id) AS eh_fan,
-    r.fan_of_star_wars AS resposta_original
-FROM respostas r
+-- 1.3 eh_fan_star_wars -> comparação com respostas EAV
+SELECT 
+    r.id AS respondent_id,
+    eh_fan_star_wars(r.id) AS eh_fan_star_wars,
+    COALESCE(fa.label, 'Sem resposta') AS resposta_original
+FROM respondent r
+LEFT JOIN LATERAL (
+    SELECT ao.label
+    FROM answer a
+    JOIN question q ON q.id = a.question_id
+    JOIN answer_option ao ON ao.id = a.option_id
+    WHERE a.respondent_id = r.id
+      AND q.statement = 'Do you consider yourself to be a fan of the Star Wars film franchise?'
+    LIMIT 1
+) fa ON TRUE
+ORDER BY r.id
 LIMIT 10;
 
 
--- Testar inserção de um novo respondente
+-- =============================================================
+-- 2) PROCEDURES
+-- =============================================================
+
+-- 2.1 inserir_respondente_com_validacao
 CALL inserir_respondente_com_validacao(
-    9999999999,  -- respondent_id (novo)
-    'Female',    -- gender
-    '30-44',     -- age
-    '$50,000 - $99,999',  -- household_income
-    'Bachelor degree',    -- education
-    'Northeast',  -- region
-    'Yes',        -- seen_any_star_wars
-    'Yes',        -- fan_of_star_wars
-    'No',         -- fan_of_startrek
-    'No',         -- fan_of_expanded_universe
-    'No',         -- familiar_with_expanded_universe
-    'Han Solo'    -- who_shot_first
+    9999999999,
+    'Female',
+    '30-44',
+    '$50,000 - $99,999',
+    'Bachelor degree',
+    'Northeast',
+    'Yes',
+    'Yes',
+    'No',
+    'No',
+    'No',
+    'Han'
 );
 
--- Verificar se foi inserido
-SELECT * FROM respostas WHERE respondent_id = 9999999999;
-
--- Primeiro, ver quantas opiniões "Very favorably" existem para o personagem 1 (Han Solo)
-SELECT COUNT(*) FROM character_opinion WHERE character_id = 1 AND opinion = 'Very favorably';
-
--- Atualizar todas as opiniões "Very favorably" para "Favorably" do Han Solo
-CALL atualizar_opiniao_personagem_lote(
-    1,                    -- character_id (Han Solo)
-    'Very favorably',     -- opiniao_anterior
-    'Favorably'           -- opiniao_nova
-);
-
--- Verificar a atualização
-SELECT COUNT(*) FROM character_opinion WHERE character_id = 1 AND opinion = 'Favorably';
-
-
--- TESTE TRIGGER 2: Validação de Ranking
-
-
--- 1. Tentar inserir ranking INVÁLIDO 
-INSERT INTO film_ranking (respondent_id, film_id, ranking)
-VALUES (16923, 1, 10);
--- Vai gerar: ERROR: Ranking deve estar entre 1 e 6, valor fornecido: 10
-
--- 2. Inserir ranking VÁLIDO 
-INSERT INTO film_ranking (respondent_id, film_id, ranking)
-VALUES (16923, 1, 3);
-
--- 3. Ver o ranking inserido
-SELECT * FROM film_ranking WHERE respondent_id = 16923 AND film_id = 1;
-
-
-
--- TESTE TRIGGER 3: Validação de Opinion
-
-
--- 1. Tentar inserir opinion VAZIA 
-INSERT INTO character_opinion (respondent_id, character_id, opinion)
-VALUES (16923, 1, '');
--- Vai gerar: ERROR: A opinião não pode estar vazia
-
--- 2. Inserir opinion VÁLIDA 
-INSERT INTO character_opinion (respondent_id, character_id, opinion)
-VALUES (16923, 1, 'Very favorably');
-
--- 3. Ver a opinion inserida
-SELECT * FROM character_opinion WHERE respondent_id = 16923 AND character_id = 1;
-
-
-
--- TESTE TRIGGER 1: Contar filme visto
-
-
--- 1. Ver quantos filmes foram vistos ANTES
-SELECT COUNT(*) as filmes_vistos_antes FROM film_seen WHERE respondent_id = 16923;
-
--- 2. Inserir um novo filme visto 
-INSERT INTO film_seen (respondent_id, film_id, seen)
-VALUES (16923, 2, 'Yes');
-
--- 3. Ver quantos filmes foram vistos DEPOIS
-SELECT COUNT(*) as filmes_vistos_depois FROM film_seen WHERE respondent_id = 16923;
-
--- 4. Ver detalhes de todos os filmes vistos
-SELECT * FROM film_seen WHERE respondent_id = 16923;
-
--- 1. Qual região tem mais respondentes?
-SELECT region, total_respondentes 
-FROM v_respondentes_por_regiao 
-ORDER BY total_respondentes DESC 
-LIMIT 1;
-
--- 2. Qual é o filme mais amado (menor ranking)?
-SELECT filmID, film_name, ranking_medio 
-FROM v_ranking_medio_filmes 
-ORDER BY ranking_medio ASC 
-LIMIT 1;
-
--- 3. Qual é o filme menos amado (maior ranking)?
-SELECT filmID, film_name, ranking_medio 
-FROM v_ranking_medio_filmes 
-ORDER BY ranking_medio DESC 
-LIMIT 1;
-
--- 4. Quantos são fans de Star Wars?
-SELECT fan_of_star_wars, total_respondentes 
-FROM v_fans_vs_nao_fans;
-
--- 5. Dos fans, quantos também são fans de Star Trek?
+-- Conferir dados demográficos e respostas EAV
 SELECT 
-    fan_of_star_wars,
-    tambem_fan_startrek
-FROM v_fans_vs_nao_fans 
-WHERE fan_of_star_wars = 'Yes';
+    r.id,
+    g.description AS gender,
+    CONCAT(ag.age_range_start,'-',ag.age_range_end) AS age_group,
+    el.name AS education_level,
+    rg.name AS region
+FROM respondent r
+LEFT JOIN gender g ON g.id = r.gender_id
+LEFT JOIN age_group ag ON ag.id = r.age_group_id
+LEFT JOIN education_level el ON el.id = r.education_level_id
+LEFT JOIN region rg ON rg.id = r.region_id
+WHERE r.id = 9999999999;
+
+SELECT q.statement, ao.label
+FROM answer a
+JOIN question q ON q.id = a.question_id
+JOIN answer_option ao ON ao.id = a.option_id
+WHERE a.respondent_id = 9999999999
+ORDER BY q.statement;
+
+
+-- 2.2 listar_respostas_completas (cursor)
+BEGIN;
+    CALL listar_respostas_completas();
+    FETCH 5 FROM respostas_cursor;
+    CLOSE respostas_cursor;
+COMMIT;
+
+
+-- 2.3 limpar_respondente
+CALL limpar_respondente(9999999999);
+SELECT * FROM respondent WHERE id = 9999999999; -- deve retornar vazio
+
+
+-- =============================================================
+-- 3) VIEWS
+-- =============================================================
+
+SELECT * FROM v_respondentes_por_regiao ORDER BY total_respondentes DESC;
+SELECT * FROM v_ranking_medio_filmes ORDER BY ranking_medio ASC NULLS LAST;
+SELECT * FROM v_fans_vs_nao_fans;
+
+
+-- =============================================================
+-- 4) TRIGGERS
+-- =============================================================
+CALL inserir_respondente_com_validacao(
+    8888888888,
+    'Male',
+    '18-29',
+    '$0 - $24,999',
+    'High school',
+    'Midwest',
+    'Yes',
+    'No',
+    'No',
+    'No',
+    'No',
+    'Han'
+);
+
+WITH params AS (
+    SELECT 
+        8888888888::bigint AS respondent_id,
+        (SELECT id FROM film LIMIT 1) AS film_id
+)
+INSERT INTO film_ranking (respondent_id, film_id, ranking)
+SELECT respondent_id, film_id, 10 FROM params;
+-- Esperado: ERROR: Ranking deve estar entre 1 e 6
+
+-- 4.2 Inserir ranking válido
+WITH params AS (
+    SELECT 
+        8888888888::bigint AS respondent_id,
+        (SELECT id FROM film LIMIT 1) AS film_id
+)
+INSERT INTO film_ranking (respondent_id, film_id, ranking)
+SELECT respondent_id, film_id, 3 FROM params
+ON CONFLICT (respondent_id, film_id) DO NOTHING;
+
+-- 4.3 answer com option_id de outra pergunta (deve falhar)
+DO $$
+DECLARE
+    v_question BIGINT;
+    v_option BIGINT;
+BEGIN
+    SELECT id INTO v_question
+    FROM question
+    WHERE statement = 'Have you seen any of the 6 films in the Star Wars franchise?'
+    LIMIT 1;
+
+    SELECT ao.id INTO v_option
+    FROM answer_option ao
+    JOIN question q ON q.id = ao.question_id
+    WHERE q.statement = 'Which character shot first?'
+    LIMIT 1;
+
+    INSERT INTO answer (respondent_id, question_id, option_id)
+    VALUES (8888888888, v_question, v_option);
+END; $$;
+-- Esperado: ERROR informando que option_id não corresponde à pergunta.
+
+-- 4.4 character_opinion com opção inválida (deve falhar)
+DO $$
+DECLARE
+    v_option BIGINT;
+    v_character INT;
+BEGIN
+    SELECT ao.id INTO v_option
+    FROM answer_option ao
+    JOIN question q ON q.id = ao.question_id
+    WHERE q.statement = 'Have you seen any of the 6 films in the Star Wars franchise?'
+    LIMIT 1;
+
+    SELECT id INTO v_character FROM character LIMIT 1;
+
+    INSERT INTO character_opinion (respondent_id, character_id, option_id)
+    VALUES (8888888888, v_character, v_option);
+END; $$;
+-- Esperado: ERROR informando que a opção não pertence a "Character opinion".
+
+
+-- 4.5 Limpeza auxiliar após testes de trigger
+CALL limpar_respondente(8888888888);
+
+
+-- =============================================================
+-- 5) LIMPEZA FINAL
+-- =============================================================
+CALL limpar_respondente(9999999999);
