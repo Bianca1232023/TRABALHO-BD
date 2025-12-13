@@ -1,12 +1,18 @@
-DROP TABLE IF EXISTS dw.fact_opinion CASCADE;
-DROP TABLE IF EXISTS dw.dim_respondent CASCADE;
-DROP TABLE IF EXISTS dw.dim_film CASCADE;
-DROP TABLE IF EXISTS dw.dim_character CASCADE;
-DROP TABLE IF EXISTS dw.fato_respostas CASCADE;
-DROP TABLE IF EXISTS dw.etl_execution CASCADE;
-DROP TABLE IF EXISTS dw.action_type CASCADE;
+set schema 'dw';
+
+--DROP TABLE IF EXISTS dw.dim_respondent CASCADE;
+--DROP TABLE IF EXISTS dw.dim_film CASCADE;
+--DROP TABLE IF EXISTS dw.dim_character CASCADE;
+--DROP TABLE IF EXISTS dw.dim_question CASCADE;
+--DROP TABLE IF EXISTS dw.dim_answer_option CASCADE;
+--DROP TABLE IF EXISTS dw.fact_response CASCADE;
+--DROP TABLE IF EXISTS dw.etl_execution CASCADE;
 
 CREATE TYPE dw.action_type AS ENUM ('I','U','D');
+
+-- =========================================================
+-- DIMENSÕES
+-- =========================================================
 
 CREATE TABLE dw.dim_respondent (
     id SERIAL PRIMARY KEY,
@@ -39,30 +45,57 @@ CREATE TABLE dw.dim_character (
     UNIQUE (character_id)
 );
 
-
-CREATE TABLE dw.fato_respostas (
+CREATE TABLE dw.dim_question (
     id SERIAL PRIMARY KEY,
-    respondent_id BIGINT NOT NULL,
-    film_id INT,
-    character_id INT,
-    opinion VARCHAR(50),
-    seen BOOLEAN,  
-    ranking INT,    
-    fan_star_wars BOOLEAN,
-    fan_star_trek BOOLEAN,
+    question_id BIGINT NOT NULL,
+    statement VARCHAR(255) NOT NULL,
     action action_type DEFAULT 'I',
     created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (question_id)
+);
+
+CREATE TABLE dw.dim_answer_option (
+    id SERIAL PRIMARY KEY,
+    option_id BIGINT NOT NULL,
+    question_id BIGINT NOT NULL,
+    code VARCHAR(30),
+    label VARCHAR(255),
+    action action_type DEFAULT 'I',
+    created_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE (option_id)
+);
+
+-- =========================================================
+-- FATO
+-- =========================================================
+
+CREATE TABLE dw.fact_response (
+    id SERIAL PRIMARY KEY,    
+    respondent_id BIGINT NOT NULL,
+    question_id BIGINT,
+    option_id BIGINT,    
+    film_id INT,
+    seen BOOLEAN,
+    ranking INT,    
+    character_id INT,    
+    action dw.action_type DEFAULT 'I',
+    created_at TIMESTAMPTZ DEFAULT now(),
+
     FOREIGN KEY (respondent_id) REFERENCES dw.dim_respondent(respondent_id),
+    FOREIGN KEY (question_id) REFERENCES dw.dim_question(question_id),
+    FOREIGN KEY (option_id) REFERENCES dw.dim_answer_option(option_id),
     FOREIGN KEY (film_id) REFERENCES dw.dim_film(film_id),
     FOREIGN KEY (character_id) REFERENCES dw.dim_character(character_id)
 );
 
-CREATE INDEX ix_fato_respostas_respondent ON dw.fato_respostas (respondent_id);
-CREATE INDEX ix_fato_respostas_character ON dw.fato_respostas (character_id);
-CREATE INDEX ix_fato_respostas_opinion ON dw.fato_respostas (opinion);
-CREATE INDEX ix_fato_respostas_seen ON dw.fato_respostas (seen);
-CREATE INDEX ix_fato_respostas_fanwars ON dw.fato_respostas (fan_star_wars);
-CREATE INDEX ix_fato_respostas_fantrek ON dw.fato_respostas (fan_star_trek);
+CREATE INDEX ix_fact_response_respondent ON dw.fact_response (respondent_id);
+CREATE INDEX ix_fact_response_question ON dw.fact_response (question_id);
+CREATE INDEX ix_fact_response_option ON dw.fact_response (option_id);
+CREATE INDEX ix_fact_response_film ON dw.fact_response (film_id);
+CREATE INDEX ix_fact_response_character ON dw.fact_response (character_id);
+CREATE INDEX ix_fact_response_seen ON dw.fact_response (seen);
+CREATE INDEX ix_fact_response_ranking ON dw.fact_response (ranking);
+
 
 CREATE TABLE dw.etl_execution (
     process VARCHAR(100) PRIMARY KEY,
