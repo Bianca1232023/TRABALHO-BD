@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>fato_respostas</name>
+    <name>fact_eav_answer</name>
     <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
     </parameters>
@@ -427,16 +428,16 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2025/12/10 00:59:12.390</created_date>
+    <created_date>2025/12/13 21:56:53.631</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2025/12/10 00:59:12.390</modified_date>
-    <key_for_session_key>H4sIAAAAAAAA/wMAAAAAAAAAAAA=</key_for_session_key>
+    <modified_date>2025/12/13 21:56:53.631</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <connection>
-    <name>star_wars</name>
+    <name>Starwars</name>
     <server>localhost</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
@@ -458,10 +459,6 @@
       </attribute>
       <attribute>
         <code>IS_CLUSTERED</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code>
         <attribute>N</attribute>
       </attribute>
       <attribute>
@@ -493,159 +490,10 @@
   <order>
     <hop>
       <from>Table input</from>
-      <to>Opinion Field Mapping</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Opinion Field Mapping</from>
-      <to>Insert / update</to>
+      <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
   </order>
-  <step>
-    <name>Insert / update</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>star_wars</connection>
-    <commit>100</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema>dw</schema>
-      <table>fato_respostas</table>
-      <key>
-        <name>respondent_id</name>
-        <field>respondent_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>film_id</name>
-        <field>film_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>character_id</name>
-        <field>character_id</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>respondent_id</name>
-        <rename>respondent_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>film_id</name>
-        <rename>film_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>character_id</name>
-        <rename>character_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>opinion</name>
-        <rename>opinion</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>seen</name>
-        <rename>seen</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>ranking</name>
-        <rename>ranking</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>fan_star_wars</name>
-        <rename>fan_star_wars</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>fan_star_trek</name>
-        <rename>fan_star_trek</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>512</xloc>
-      <yloc>224</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Opinion Field Mapping</name>
-    <type>ValueMapper</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <field_to_use>opinion</field_to_use>
-    <target_field/>
-    <non_match_default/>
-    <fields>
-      <field>
-        <source_value>Neither favorably nor unfavorably (neutral)</source_value>
-        <target_value>N</target_value>
-      </field>
-      <field>
-        <source_value>Somewhat favorably</source_value>
-        <target_value>SF</target_value>
-      </field>
-      <field>
-        <source_value>Somewhat unfavorably</source_value>
-        <target_value>SU</target_value>
-      </field>
-      <field>
-        <source_value>Unfamiliar (N/A)</source_value>
-        <target_value>U</target_value>
-      </field>
-      <field>
-        <source_value>Very favorably</source_value>
-        <target_value>VF</target_value>
-      </field>
-      <field>
-        <source_value>Very unfavorably</source_value>
-        <target_value>VU</target_value>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>352</xloc>
-      <yloc>224</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
   <step>
     <name>Table input</name>
     <type>TableInput</type>
@@ -657,52 +505,21 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>star_wars</connection>
-    <sql>SELECT
-    r.respondent_id,
-    fs.film_id,
-    NULL::INT              AS character_id,
-    NULL::VARCHAR(50)      AS opinion,
-    CASE
-        WHEN LOWER(fs.seen) IN ('yes', 'y', 'true', '1') THEN TRUE
-        ELSE FALSE
-    END                    AS seen,
-    fr.ranking,
-    CASE
-        WHEN LOWER(r.fan_of_star_wars) IN ('yes','y','true','1')
-            THEN TRUE ELSE FALSE
-    END                    AS fan_star_wars,
-    CASE
-        WHEN LOWER(r.fan_of_startrek) IN ('yes','y','true','1')
-            THEN TRUE ELSE FALSE
-    END                    AS fan_star_trek
-FROM respostas r
-LEFT JOIN film_seen fs
-       ON fs.respondent_id = r.id
-LEFT JOIN film_ranking fr
-       ON fr.respondent_id = r.id
-      AND fr.film_id = fs.film_id
-
-UNION ALL
-
-SELECT
-    r.respondent_id,
-    NULL::INT              AS film_id,
-    co.character_id,
-    COALESCE(co.opinion, NULL)::VARCHAR(50) AS opinion,
-    NULL::BOOLEAN          AS seen,
-    NULL::INT              AS ranking,
-    CASE
-        WHEN LOWER(r.fan_of_star_wars) IN ('yes','y','true','1')
-            THEN TRUE ELSE FALSE
-    END                    AS fan_star_wars,
-    CASE
-        WHEN LOWER(r.fan_of_startrek) IN ('yes','y','true','1')
-            THEN TRUE ELSE FALSE
-    END                    AS fan_star_trek
-FROM respostas r
-JOIN character_opinion co
-  ON co.respondent_id = r.id;
+    <connection>Starwars</connection>
+    <sql>select
+  a.respondent_id,
+  a.question_id,
+  a.option_id,
+  cast(null as int) as film_id,
+  cast(null as boolean) as seen,
+  cast(null as int) as ranking,
+  cast(null as int) as character_id
+from answer a
+left join dw.fact_response f
+  on f.respondent_id = a.respondent_id
+ and f.question_id = a.question_id
+ and f.option_id = a.option_id
+where f.id is null;
 </sql>
     <limit>0</limit>
     <lookup/>
@@ -737,11 +554,11 @@ JOIN character_opinion co
       <value-meta>
         <type>Integer</type>
         <storagetype>normal</storagetype>
-        <name>film_id</name>
-        <length>9</length>
+        <name>question_id</name>
+        <length>15</length>
         <precision>0</precision>
         <origin>Table input</origin>
-        <comments>film_id</comments>
+        <comments>question_id</comments>
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
@@ -760,11 +577,11 @@ JOIN character_opinion co
       <value-meta>
         <type>Integer</type>
         <storagetype>normal</storagetype>
-        <name>character_id</name>
-        <length>9</length>
+        <name>option_id</name>
+        <length>15</length>
         <precision>0</precision>
         <origin>Table input</origin>
-        <comments>character_id</comments>
+        <comments>option_id</comments>
         <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
@@ -781,14 +598,14 @@ JOIN character_opinion co
         <lenient_string_to_number>N</lenient_string_to_number>
       </value-meta>
       <value-meta>
-        <type>String</type>
+        <type>Integer</type>
         <storagetype>normal</storagetype>
-        <name>opinion</name>
-        <length>50</length>
-        <precision>-1</precision>
+        <name>film_id</name>
+        <length>9</length>
+        <precision>0</precision>
         <origin>Table input</origin>
-        <comments>opinion</comments>
-        <conversion_Mask/>
+        <comments>film_id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
         <currency_symbol/>
@@ -850,37 +667,14 @@ JOIN character_opinion co
         <lenient_string_to_number>N</lenient_string_to_number>
       </value-meta>
       <value-meta>
-        <type>Boolean</type>
+        <type>Integer</type>
         <storagetype>normal</storagetype>
-        <name>fan_star_wars</name>
-        <length>-1</length>
-        <precision>-1</precision>
+        <name>character_id</name>
+        <length>9</length>
+        <precision>0</precision>
         <origin>Table input</origin>
-        <comments>fan_star_wars</comments>
-        <conversion_Mask/>
-        <decimal_symbol>,</decimal_symbol>
-        <grouping_symbol>.</grouping_symbol>
-        <currency_symbol/>
-        <trim_type>none</trim_type>
-        <case_insensitive>N</case_insensitive>
-        <collator_disabled>Y</collator_disabled>
-        <collator_strength>0</collator_strength>
-        <sort_descending>N</sort_descending>
-        <output_padding>N</output_padding>
-        <date_format_lenient>N</date_format_lenient>
-        <date_format_locale>pt_BR</date_format_locale>
-        <date_format_timezone>America/Sao_Paulo</date_format_timezone>
-        <lenient_string_to_number>N</lenient_string_to_number>
-      </value-meta>
-      <value-meta>
-        <type>Boolean</type>
-        <storagetype>normal</storagetype>
-        <name>fan_star_trek</name>
-        <length>-1</length>
-        <precision>-1</precision>
-        <origin>Table input</origin>
-        <comments>fan_star_trek</comments>
-        <conversion_Mask/>
+        <comments>character_id</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
         <decimal_symbol>,</decimal_symbol>
         <grouping_symbol>.</grouping_symbol>
         <currency_symbol/>
@@ -905,8 +699,80 @@ JOIN character_opinion co
       </output>
     </remotesteps>
     <GUI>
-      <xloc>208</xloc>
-      <yloc>224</yloc>
+      <xloc>432</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Table output</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>Starwars</connection>
+    <schema>dw</schema>
+    <table>fact_response</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+      <field>
+        <column_name>respondent_id</column_name>
+        <stream_name>respondent_id</stream_name>
+      </field>
+      <field>
+        <column_name>question_id</column_name>
+        <stream_name>question_id</stream_name>
+      </field>
+      <field>
+        <column_name>option_id</column_name>
+        <stream_name>option_id</stream_name>
+      </field>
+      <field>
+        <column_name>film_id</column_name>
+        <stream_name>film_id</stream_name>
+      </field>
+      <field>
+        <column_name>seen</column_name>
+        <stream_name>seen</stream_name>
+      </field>
+      <field>
+        <column_name>ranking</column_name>
+        <stream_name>ranking</stream_name>
+      </field>
+      <field>
+        <column_name>character_id</column_name>
+        <stream_name>character_id</stream_name>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>608</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
